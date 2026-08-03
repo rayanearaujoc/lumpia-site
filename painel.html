@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumpia — Painel do Evento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     LUMPIA · PAINEL — DESIGN TOKENS (versão clara)
+     ============================================================ */
+  :root{
+    --bg:          #faf9f7;
+    --surface:     #ffffff;
+    --border:      #e7e5e0;
+    --border-soft: #efeee9;
+
+    --text:        #18181b;
+    --text-soft:   #6b6b70;
+    --text-mute:   #9b9a9e;
+
+    --accent:      #6e4bff;
+    --accent-dim:  #f1eeff;
+
+    --positive:      #3f8f5c;
+    --positive-dim:  #eaf5ee;
+
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+
+    --display: 'Poppins', sans-serif;
+    --sans:    'Inter', sans-serif;
+    --mono:    'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  button{ font-family: inherit; }
+
+  .wrap{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  /* ============================================================
+     TOPBAR
+     ============================================================ */
+  .topbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+.brand-mark{
+    height: 16px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    filter: brightness(0);
+}
+
+.brand-mark img{ height: 100%; width: auto; display: block; }
+
+  .brand-name{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .brand-name span{
+    color: var(--text-mute);
+    font-weight: 400;
+  }
+
+  .topbar-right{
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .updated-label{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-mute);
+    white-space: nowrap;
+  }
+
+  .btn-export{
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .btn-export:hover{ background: #5c39f2; }
+  .btn-export:active{ transform: translateY(1px); }
+  .btn-export svg{ width: 16px; height: 16px; display: block; }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    padding: 48px 0 36px;
+  }
+
+  .event-title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(30px, 4.6vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+
+  .event-sub{
+    font-size: 15px;
+    color: var(--text-soft);
+  }
+
+  .event-sub b{ color: var(--text); font-weight: 600; }
+
+  /* ============================================================
+     STATS — grid dinâmico (2 a N cards)
+     ============================================================ */
+  .stats{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin: 8px 0 40px;
+  }
+
+  .stat-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 20px 18px;
+  }
+
+  .stat-label{
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+  }
+
+  .stat-value{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(26px, 3.2vw, 32px);
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  /* ============================================================
+     PAINEL DE CONVIDADOS
+     ============================================================ */
+  .panel{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .panel-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .search-field{
+    position: relative;
+    min-width: 230px;
+  }
+
+  .search-field svg{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: var(--text-mute);
+    pointer-events: none;
+  }
+
+  .search{
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 16px;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    transition: border-color 0.15s ease;
+  }
+
+  .search::placeholder{ color: var(--text-mute); }
+  .search:focus{ border-color: var(--accent); outline: none; }
+
+  /* ============================================================
+     TABELA
+     ============================================================ */
+  .table-scroll{ overflow-x: auto; }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 480px;
+  }
+
+  thead th{
+    text-align: left;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    color: var(--text-mute);
+    padding: 13px 22px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  thead th.col-data{ text-align: center; }
+
+  tbody td{
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td{ border-bottom: none; }
+  tbody tr:hover{ background: #fbfaf8; }
+
+  .idx{
+    font-family: var(--mono);
+    color: var(--text-mute);
+    font-size: 12px;
+    width: 34px;
+  }
+
+  .guest-name{ font-weight: 500; color: var(--text); }
+
+  td.col-data{
+    font-family: var(--mono);
+    text-align: center;
+    color: var(--text-soft);
+  }
+
+  .pill{
+    display: inline-block;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    padding: 3px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-mute);
+  }
+
+  .pill.yes{
+    color: var(--positive);
+    border-color: #c9e5d4;
+    background: var(--positive-dim);
+  }
+
+  /* ============================================================
+     ESTADOS
+     ============================================================ */
+  .state{
+    padding: 80px 24px;
+    text-align: center;
+  }
+
+  .state-title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .state-sub{
+    font-size: 13.5px;
+    color: var(--text-soft);
+    max-width: 320px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .hidden{ display: none !important; }
+
+  /* ============================================================
+     MOBILE — cartões em vez de tabela
+     ============================================================ */
+  @media (max-width: 640px){
+    .wrap{ padding: 0 16px 90px; }
+    .topbar{ padding: 16px; flex-wrap: wrap; }
+    .brand-name span{ display: none; }
+    .topbar-right{ gap: 12px; }
+    .updated-label{ display: none; }
+    .hero{ padding: 32px 0 26px; }
+    .stats{ grid-template-columns: repeat(2, 1fr); margin-bottom: 30px; }
+    .panel-head{ padding: 16px; }
+    .search-field{ width: 100%; min-width: 0; }
+
+    thead{ display: none; }
+    .table-scroll{ overflow-x: visible; }
+    table{ min-width: 0; }
+    table, tbody{ display: block; width: 100%; }
+
+    tbody tr{
+      display: block;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td{
+      display: block;
+      width: 100%;
+      border-bottom: none;
+      padding: 0;
+    }
+
+    .idx{ display: none; }
+
+    .guest-name{
+      font-size: 15.5px;
+      margin-bottom: 12px;
+    }
+
+    td.col-data{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: right;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text);
+      padding: 7px 0;
+    }
+
+    td.col-data + td.col-data{
+      border-top: 1px solid var(--border-soft);
+    }
+
+    td.col-data::before{
+      content: attr(data-label);
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 13.5px;
+      letter-spacing: 0;
+      color: var(--text-mute);
+    }
+  }
+
+  /* ============================================================
+     IMPRESSÃO / EXPORTAR PDF
+     ============================================================ */
+  @media print{
+    .topbar .btn-export{ display: none !important; }
+    .search-field{ display: none !important; }
+    tbody tr:hover{ background: transparent !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+        <div class="brand-mark">
+            <img src="static/logo.svg" alt="Lumpia" />
+        </div>
+      <div class="brand-name">Lumpia <span>· painel do evento</span></div>
+    </div>
+    <div class="topbar-right">
+      <span class="updated-label" id="updatedAt">—</span>
+      <button class="btn-export" id="exportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="hero">
+      <h1 class="event-title" id="eventTitle">Carregando…</h1>
+      <div class="event-sub" id="eventSub"></div>
+    </div>
+
+    <div id="content" class="hidden">
+      <div class="stats" id="statsGrid"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Lista de convidados</div>
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search" id="searchInput" type="text" placeholder="Buscar convidado por nome" />
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead id="tableHead"></thead>
+            <tbody id="guestRows"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="state hidden">
+          <div class="state-title">Nenhuma confirmação ainda</div>
+          <div class="state-sub">Assim que alguém responder ao formulário, a lista aparece aqui automaticamente.</div>
+        </div>
+
+        <div id="noResultsState" class="state hidden">
+          <div class="state-title">Nenhum convidado encontrado</div>
+          <div class="state-sub">Tente buscar por outro nome.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loadingState" class="state">
+      <div class="state-title">Carregando confirmações…</div>
+    </div>
+
+    <div id="errorState" class="state hidden">
+      <div class="state-title">Não encontramos esse link</div>
+      <div class="state-sub">Confira o endereço ou fale com a Lumpia.</div>
+    </div>
+
+  </div>
+
+<script>
+  // ============================================================
+  // CONFIGURAÇÃO
+  // ============================================================
+  const API_BASE = 'https://tgjtfrzpauzegxsxdhmh.supabase.co/functions/v1/get-dashboard';
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('t') || params.get('token');
+
+  const el = (id) => document.getElementById(id);
+
+  // Apenas estes campos são exibidos. Qualquer outro campo que a API
+  // venha a retornar (ids, timestamps, metadados internos etc.) é
+  // ignorado — o painel só mostra o que faz sentido para o cliente.
+  const SUMMARY_FIELDS = [
+    { key: 'totalConfirmed', label: 'Confirmados' },
+    { key: 'totalAdults',    label: 'Adultos' },
+    { key: 'totalChildren',  label: 'Crianças' },
+    { key: 'parkingCount',   label: 'Estacionamento' }
+  ];
+
+  const GUEST_FIELDS = [
+    { key: 'adults',   label: 'Adultos' },
+    { key: 'children', label: 'Crianças' },
+    { key: 'parking',  label: 'Estacionamento' }
+  ];
+
+  function isYesNoValue(v){
+    return v === 'Sim' || v === 'Não' || v === true || v === false;
+  }
+
+  function showState(name){
+    ['loadingState','errorState','content'].forEach((id) => {
+      el(id).classList.toggle('hidden', id !== name);
+    });
+  }
+
+  function formatDate(iso){
+    if(!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  }
+
+  function setUpdatedNow(){
+    const now = new Date();
+    const time = now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    el('updatedAt').textContent = `Atualizado às ${time}`;
+  }
+
+  // ------------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------------
+  function render(data){
+    el('eventTitle').textContent = data.form.name || 'Evento';
+    const dateStr = formatDate(data.form.eventDate);
+    const count = data.summary.totalConfirmed ?? (data.guests || []).length;
+    el('eventSub').innerHTML = `${dateStr ? dateStr + ' · ' : ''}<b>${count}</b> ${count === 1 ? 'pessoa confirmada' : 'pessoas confirmadas'} até agora`;
+    setUpdatedNow();
+
+    renderStats(data.summary);
+    renderTableHead(data.guests);
+    renderGuests(data.guests);
+    showState('content');
+  }
+
+  function renderStats(summary){
+    const grid = el('statsGrid');
+    grid.innerHTML = '';
+
+    SUMMARY_FIELDS
+      .filter(f => summary && summary[f.key] !== undefined && summary[f.key] !== null)
+      .forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        card.innerHTML = `
+          <div class="stat-label">${f.label}</div>
+          <div class="stat-value">${summary[f.key]}</div>
+        `;
+        grid.appendChild(card);
+      });
+  }
+
+  function getActiveGuestColumns(guests){
+    const present = new Set();
+    (guests || []).forEach(g => GUEST_FIELDS.forEach(f => { if(g[f.key] !== undefined) present.add(f.key); }));
+    return GUEST_FIELDS.filter(f => present.has(f.key));
+  }
+
+  function renderTableHead(guests){
+    const columns = getActiveGuestColumns(guests);
+    window.__columns = columns;
+    const thead = el('tableHead');
+    thead.innerHTML = `
+      <tr>
+        <th></th>
+        <th>Convidado</th>
+        ${columns.map(c => `<th class="col-data">${c.label}</th>`).join('')}
+      </tr>
+    `;
+  }
+
+  function renderGuests(guests){
+    window.__guests = guests;
+    const tbody = el('guestRows');
+    const columns = window.__columns || [];
+    tbody.innerHTML = '';
+
+    const total = (window.__allGuests || guests).length;
+    el('emptyState').classList.toggle('hidden', total !== 0);
+    el('noResultsState').classList.toggle('hidden', !(guests.length === 0 && total > 0));
+
+    guests.forEach((g, i) => {
+      const tr = document.createElement('tr');
+      const cells = columns.map(f => {
+        const v = g[f.key];
+        if(isYesNoValue(v)){
+          const yes = v === 'Sim' || v === true;
+          const label = typeof v === 'boolean' ? (v ? 'Sim' : 'Não') : v;
+          return `<td class="col-data" data-label="${f.label}"><span class="pill ${yes ? 'yes':''}">${escapeHtml(String(label))}</span></td>`;
+        }
+        return `<td class="col-data" data-label="${f.label}">${v ?? '—'}</td>`;
+      }).join('');
+
+      tr.innerHTML = `
+        <td class="idx">${String(i + 1).padStart(2,'0')}</td>
+        <td class="guest-name">${escapeHtml(g.name)}</td>
+        ${cells}
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  el('searchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    window.__allGuests = window.__allGuests || window.__guests;
+    const filtered = (window.__allGuests || []).filter(g => g.name.toLowerCase().includes(q));
+    renderGuests(filtered);
+  });
+
+  el('exportBtn').addEventListener('click', () => window.print());
+
+  // ------------------------------------------------------------
+  // LOAD
+  // ------------------------------------------------------------
+  async function load(){
+    if(!token){
+      showState('errorState');
+      return;
+    }
+    try{
+      const res = await fetch(`${API_BASE}?token=${encodeURIComponent(token)}`);
+      if(!res.ok) throw new Error('request failed');
+      const data = await res.json();
+      window.__allGuests = data.guests;
+      render(data);
+    }catch(err){
+      console.error(err);
+      showState('errorState');
+    }
+  }
+
+  load();
+</script>
+
+</body>
+</html>
